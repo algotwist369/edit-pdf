@@ -1,4 +1,4 @@
-import { Pause, Play, Square } from 'lucide-react';
+import { Pause, Play, Square, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiRequest } from '../api/client.js';
@@ -13,6 +13,7 @@ export const BatchHistory = () => {
   const { token } = useAuth();
   const [batches, setBatches] = useState([]);
   const [error, setError] = useState('');
+  const [deletingBatchId, setDeletingBatchId] = useState('');
 
   const load = async () => {
     const payload = await apiRequest('/api/pdf-batches', { token });
@@ -35,6 +36,23 @@ export const BatchHistory = () => {
     }
   };
 
+  const deleteBatch = async (event, batch) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!window.confirm(`Delete "${batch.name}" and all related PDFs, reports, and ZIP files?`)) return;
+
+    setError('');
+    setDeletingBatchId(batch._id);
+    try {
+      await apiRequest(`/api/pdf-batches/${batch._id}`, { method: 'DELETE', token });
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDeletingBatchId('');
+    }
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-semibold">Batch history</h1>
@@ -42,7 +60,7 @@ export const BatchHistory = () => {
       <section className="mt-6 rounded-md border border-slate-200 bg-white">
         {batches.map((batch) => (
           <Link
-            className="grid grid-cols-[1fr_150px_190px_130px] items-center border-b border-slate-100 px-4 py-3 text-sm hover:bg-panel"
+            className="grid grid-cols-[1fr_150px_230px_130px] items-center border-b border-slate-100 px-4 py-3 text-sm hover:bg-panel"
             key={batch._id}
             to={`/batches/${batch._id}/process`}
           >
@@ -59,6 +77,7 @@ export const BatchHistory = () => {
                 disabled={!canPause(batch.status)}
                 onClick={(event) => controlBatch(event, batch._id, 'pause')}
                 title="Pause batch"
+                type="button"
               >
                 <Pause size={15} />
               </button>
@@ -67,6 +86,7 @@ export const BatchHistory = () => {
                 disabled={!canResume(batch.status)}
                 onClick={(event) => controlBatch(event, batch._id, 'resume')}
                 title="Resume batch"
+                type="button"
               >
                 <Play size={15} />
               </button>
@@ -75,8 +95,18 @@ export const BatchHistory = () => {
                 disabled={!canCancel(batch.status)}
                 onClick={(event) => controlBatch(event, batch._id, 'cancel')}
                 title="Cancel batch"
+                type="button"
               >
                 <Square size={15} />
+              </button>
+              <button
+                className="focus-ring rounded-md border border-rose-300 bg-rose-50 p-2 text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
+                disabled={deletingBatchId === batch._id}
+                onClick={(event) => deleteBatch(event, batch)}
+                title="Delete batch history"
+                type="button"
+              >
+                <Trash2 size={15} />
               </button>
             </div>
             <div className="text-right text-slate-500">{new Date(batch.createdAt).toLocaleDateString()}</div>

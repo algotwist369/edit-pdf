@@ -372,7 +372,7 @@ export const ProcessBatch = () => {
                 </button>
               </div>
             </div>
-            <div className="min-h-0 flex-1 overflow-hidden bg-slate-100">
+            <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-100">
               {editorOpen ? (
                 <ManualPdfEditor
                   batchId={batchId}
@@ -417,3 +417,4 @@ export const ProcessBatch = () => {
     </div>
   );
 };
+
