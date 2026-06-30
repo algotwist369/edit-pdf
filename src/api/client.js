@@ -1,5 +1,6 @@
-const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
-const API_BASE_URL = configuredApiBaseUrl || (import.meta.env.PROD ? '' : 'http://localhost:8080');
+// const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
+// const API_BASE_URL = configuredApiBaseUrl || (import.meta.env.PROD ? '' : 'https://pdf.api.d0s369.co.in');
+const API_BASE_URL = 'https://pdf.api.d0s369.co.in';
 
 export class ApiError extends Error {
   constructor(message, status) {
