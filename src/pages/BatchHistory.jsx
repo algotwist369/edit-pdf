@@ -8,6 +8,7 @@ import { useAuth } from '../state/auth.jsx';
 const canPause = (status) => ['queued', 'processing'].includes(status);
 const canResume = (status) => status === 'paused';
 const canCancel = (status) => !['completed', 'completed_with_warnings', 'failed', 'cancelled'].includes(status);
+const canDelete = (status) => !['queued', 'processing'].includes(status);
 
 export const BatchHistory = () => {
   const { token } = useAuth();
@@ -101,7 +102,7 @@ export const BatchHistory = () => {
               </button>
               <button
                 className="focus-ring rounded-md border border-rose-300 bg-rose-50 p-2 text-rose-700 disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={deletingBatchId === batch._id}
+                disabled={deletingBatchId === batch._id || !canDelete(batch.status)}
                 onClick={(event) => deleteBatch(event, batch)}
                 title="Delete batch history"
                 type="button"
@@ -117,3 +118,4 @@ export const BatchHistory = () => {
     </div>
   );
 };
+

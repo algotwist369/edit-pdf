@@ -1,4 +1,5 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
+const API_BASE_URL = configuredApiBaseUrl || (import.meta.env.PROD ? '' : 'http://localhost:8080');
 
 export class ApiError extends Error {
   constructor(message, status) {
@@ -11,6 +12,10 @@ export const apiRequest = async (
   path,
   { token, method = 'GET', body, headers = {}, responseType = 'auto' } = {}
 ) => {
+  if (import.meta.env.PROD && !configuredApiBaseUrl) {
+    throw new ApiError('Production API URL is not configured. Set VITE_API_BASE_URL in Vercel.', 0);
+  }
+
   let response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
@@ -23,7 +28,7 @@ export const apiRequest = async (
       body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined
     });
   } catch {
-    throw new ApiError(`Backend is not reachable at ${API_BASE_URL}. Start the backend server and MongoDB.`, 0);
+    throw new ApiError(`Backend is not reachable at ${API_BASE_URL || 'the configured API URL'}.`, 0);
   }
 
   if (!response.ok) {

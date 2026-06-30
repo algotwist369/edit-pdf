@@ -55,7 +55,7 @@ export const ProcessBatch = () => {
     const clockTimer = setInterval(() => setNow(Date.now()), 1000);
     const socket = io(apiBaseUrl, {
       auth: { token },
-      transports: ['websocket']
+      transports: ['websocket', 'polling']
     });
 
     socket.on('connect', () => {
@@ -417,4 +417,5 @@ export const ProcessBatch = () => {
     </div>
   );
 };
+
 
